@@ -1,0 +1,53 @@
+// Small client-side behavior: smooth scroll, basic contact form "send" simulation
+document.getElementById('year').textContent = new Date().getFullYear();
+
+function scrollToHash(hash){
+  const el = document.querySelector(hash);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function submitForm(e){
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+  const status = document.getElementById('form-status');
+
+  if(!name || !email || !message){
+    status.textContent = 'Please fill all fields.';
+    return false;
+  }
+
+  // No server: we provide a mailto fallback to open user's email client
+  const subject = encodeURIComponent('Website Inquiry from ' + name);
+  const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+  const mailto = `mailto:vitorvitin786@gmail.com?subject=${subject}&body=${body}`;
+
+  // Inform the user and open the email client
+  status.textContent = 'Opening your email client to send the message...';
+  setTimeout(() => {
+    window.location.href = mailto;
+    status.textContent = 'If your email client did not open, please email vitorvitin786@gmail.com directly.';
+  }, 500);
+
+  return false; // prevent further submit
+}
+
+function resetForm(){
+  document.getElementById('contact-form').reset();
+  document.getElementById('form-status').textContent = '';
+}
+
+// Optional: intercept links to internal hashes for smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', (ev)=>{
+    const href = a.getAttribute('href');
+    if(href === '#' || href === '#!') return;
+    const target = document.querySelector(href);
+    if(target){
+      ev.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+});
